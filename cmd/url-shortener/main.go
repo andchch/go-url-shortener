@@ -30,7 +30,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	_ = storage
+	storage.SaveURL("test.ru", "tst.ru")
+	storage.GetURL("tst.ru")
 }
 
 func setupLogger(env string) *slog.Logger {

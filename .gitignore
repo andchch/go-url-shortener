@@ -26,5 +26,8 @@ go.work.sum
 
 # Config files
 local.yaml
+config/local.yaml
+./config
 dev.yaml
 prod.yaml
+storage/storage.db
