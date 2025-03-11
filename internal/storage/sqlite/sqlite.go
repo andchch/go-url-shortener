@@ -6,7 +6,6 @@ import (
 	"url-shortener/internal/storage"
 
 	"github.com/mattn/go-sqlite3"
-	_ "github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {
@@ -71,9 +70,18 @@ func (s *Storage) GetURL(alias string) (string, error) {
 	const op = "storage.sqlite.GetURL"
 
 	stmt, err := s.db.Prepare("SELECT url from url WHERE alias = ?")
-
 	if err != nil {
-		return 0, fmt
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
+
+	var url string
+	err = stmt.QueryRow(alias).Scan(&url)
+	if err != nil {
+		return "", fmt.Errorf("%s: %w", op, err)
+	}
+
+	fmt.Printf("URL: %s Alias: %s", url, alias)
+	return url, nil
 }
+
 // WIP
