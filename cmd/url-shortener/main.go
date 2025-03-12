@@ -31,7 +31,9 @@ func main() {
 	}
 
 	storage.SaveURL("test.ru", "tst.ru")
+	storage.SaveURL("nottest.ru", "btst.ru")
 	storage.GetURL("tst.ru")
+	storage.DeleteURL("btst.ru")
 }
 
 func setupLogger(env string) *slog.Logger {
