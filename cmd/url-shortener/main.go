@@ -3,15 +3,23 @@ package main
 import (
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"url-shortener/internal/config"
+	"url-shortener/internal/http-server/handlers/redirect"
+	"url-shortener/internal/http-server/handlers/url/save"
+	"url-shortener/internal/http-server/handlers/url/delete"
+	mwLogger "url-shortener/internal/http-server/middleware/logger"
 	"url-shortener/internal/lib/logger/sl"
 	"url-shortener/internal/storage/sqlite"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 const (
 	envLocal = "local"
-	envDev	 = "dev"
+	envDev   = "dev"
 	envProd  = "prod"
 )
 
@@ -30,10 +38,37 @@ func main() {
 		os.Exit(1)
 	}
 
-	storage.SaveURL("test.ru", "tst.ru")
-	storage.SaveURL("nottest.ru", "btst.ru")
-	storage.GetURL("tst.ru")
-	storage.DeleteURL("btst.ru")
+	// storage.SaveURL("test.ru", "tst.ru")
+	// storage.SaveURL("nottest.ru", "btst.ru")
+	// storage.GetURL("tst.ru")
+	// storage.DeleteURL("btst.ru")
+
+	router := chi.NewRouter()
+
+	// middleware
+	router.Use(middleware.RequestID)
+	// router.Use(middleware.Logger)
+	router.Use(mwLogger.New(log))
+	router.Use(middleware.Recoverer)
+	router.Use(middleware.URLFormat)
+
+	router.Post("/url", save.New(log, storage))
+	router.Get("/{alias}", redirect.New(log, storage))
+	router.Delete("/delete/{alias}", delete.New(log, storage))
+
+	log.Info("staring server", slog.String("address", cfg.Address))
+
+	srv := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      router,
+		ReadTimeout:  cfg.HTTPServer.Timeout,
+		WriteTimeout: cfg.HTTPServer.Timeout,
+		IdleTimeout:  cfg.HTTPServer.IdleTimeout,
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
 }
 
 func setupLogger(env string) *slog.Logger {
