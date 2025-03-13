@@ -31,3 +31,5 @@ config/local.yaml
 dev.yaml
 prod.yaml
 storage/storage.db
+
+./.idea
