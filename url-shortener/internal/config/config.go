@@ -11,13 +11,13 @@ import (
 type Config struct {
 	Env         string `yaml:"env" env:"ENV" env-default:"local" env-required:"true"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
-	HTTPServer	`yaml:"http_server"`
+	HTTPServer  `yaml:"http_server"`
 }
 
 type HTTPServer struct {
-	Address 	string 			`yaml:"address" env-default:"localhost:8080"`
-	Timeout 	time.Duration	`yaml:"timeout"`
-	IdleTimeout	time.Duration	`yaml:"idle_timeout"`
+	Address     string        `yaml:"address" env-default:"localhost:8080"`
+	Timeout     time.Duration `yaml:"timeout"`
+	IdleTimeout time.Duration `yaml:"idle_timeout"`
 }
 
 func MustLoad() *Config {

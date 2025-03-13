@@ -1,4 +1,4 @@
-package redirect
+package delete
 
 import (
 	"errors"
@@ -13,13 +13,13 @@ import (
 	"github.com/go-chi/render"
 )
 
-type URLGetter interface {
-	GetURL(alias string) (string, error)
+type URLDeleter interface {
+	DeleteURL(aliasToDelete string) error
 }
 
-func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
+func New(log *slog.Logger, urlDeleter URLDeleter) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		const op = "handlers.url.redirect.New"
+		const op = "handlers.url.delete.New"
 
 		log = log.With(
 			slog.String("op", op),
@@ -35,7 +35,7 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 			return
 		}
 
-		resURL, err := urlGetter.GetURL(alias)
+		err := urlDeleter.DeleteURL(alias)
 		if errors.Is(err, storage.ErrURLNotFound) {
 			log.Info("url not found", "alias", alias)
 
@@ -51,8 +51,6 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 			return
 		}
 
-		log.Info("got url", slog.String("url", resURL))
-
-		http.Redirect(w, r, resURL, http.StatusFound)
+		log.Info("url deleted")
 	}
 }

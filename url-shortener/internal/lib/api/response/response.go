@@ -13,20 +13,20 @@ type Response struct {
 }
 
 const (
-	StatusOK = "OK"
+	StatusOK    = "OK"
 	StatusError = "Error"
 )
 
 func OK() Response {
-	return Response {
+	return Response{
 		Status: StatusOK,
 	}
 }
 
 func Error(msg string) Response {
-	return Response {
+	return Response{
 		Status: StatusError,
-		Error: msg,
+		Error:  msg,
 	}
 }
 
@@ -46,6 +46,6 @@ func ValidationError(errs validator.ValidationErrors) Response {
 
 	return Response{
 		Status: StatusError,
-		Error: strings.Join(errMsgs, ", "),
+		Error:  strings.Join(errMsgs, ", "),
 	}
 }
